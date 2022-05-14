@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { AuthService } from './../../../core/services/auth.service';
-
+import { MyValidators } from './../../../utils/validators'
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
@@ -16,7 +16,7 @@ export class RegisterComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
   ) {
     this.buildForm();
   }
@@ -38,8 +38,29 @@ export class RegisterComponent implements OnInit {
   private buildForm() {
     this.form = this.formBuilder.group({
       email: ['', [Validators.required]],
-      password: ['', [Validators.required]],
+      password: ['', [Validators.required, Validators.minLength(6), MyValidators.validPassword]],
+      confirmPassword: ['', [Validators.required]],
+      type: ['company', [Validators.required]],
+      companyName: ['',[Validators.required]]
+    }, {
+      validators: MyValidators.matchPasswords
     });
-  }
 
+    this.typeField.valueChanges
+      .subscribe(value => {
+        console.log(value);
+        if(value === 'company'){
+          this.companyNameField.setValidators([Validators.required]);
+        }else{
+          this.companyNameField.setValidators(null);
+        }
+        this.companyNameField.updateValueAndValidity();
+      });
+  }
+  get typeField(){
+    return this.form.get('type');
+  }
+  get companyNameField(){
+    return this.form.get('companyName');
+  }
 }

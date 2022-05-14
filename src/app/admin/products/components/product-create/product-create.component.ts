@@ -7,8 +7,10 @@ import { finalize } from 'rxjs/operators';
 
 import { MyValidators } from './../../../../utils/validators';
 import { ProductsService } from './../../../../core/services/products/products.service';
+import { CategoriesService } from 'src/app/core/services/categories.service';
 
 import { Observable } from 'rxjs';
+import { Category } from 'src/app/core/models/category.model';
 
 @Component({
   selector: 'app-product-create',
@@ -19,17 +21,20 @@ export class ProductCreateComponent implements OnInit {
 
   form: FormGroup;
   image$: Observable<any>;
+  categories: Category[] = [];
 
   constructor(
     private formBuilder: FormBuilder,
     private productsService: ProductsService,
     private router: Router,
-    private storage: AngularFireStorage
+    private storage: AngularFireStorage,
+    private categoriesService:CategoriesService
   ) {
     this.buildForm();
   }
 
   ngOnInit() {
+    this.getCategories();
   }
 
   saveProduct(event: Event) {
@@ -65,16 +70,35 @@ export class ProductCreateComponent implements OnInit {
 
   private buildForm() {
     this.form = this.formBuilder.group({
-      id: ['', [Validators.required]],
-      title: ['', [Validators.required]],
+      name: ['', [Validators.required, Validators.minLength(4)]],
       price: ['', [Validators.required, MyValidators.isPriceValid]],
-      image: [''],
-      description: ['', [Validators.required]],
+      image: ['', Validators.required],
+      category_id: ['', Validators.required],
+      description: ['', [Validators.required, Validators.minLength(10)]],
+      stock: [100, [Validators.required]]
     });
+
+    this.form.get('stock').valueChanges.subscribe((value => {
+      console.log(value);
+
+    }))
+  }
+
+  private getCategories() {
+    this.categoriesService.getAllCategories()
+    .subscribe((data) => {
+      this.categories = data;
+
+    })
   }
 
   get priceField() {
     return this.form.get('price');
   }
-
+  get nameField() {
+    return this.form.get('name');
+  }
+  get descriptionField() {
+    return this.form.get('description');
+  }
 }

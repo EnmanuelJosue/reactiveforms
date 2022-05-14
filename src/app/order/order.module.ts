@@ -6,11 +6,13 @@ import { OrderComponent } from './components/order/order.component';
 
 import { MaterialModule } from './../material/material.module';
 import { SharedModule } from './../shared/shared.module';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [OrderComponent],
   imports: [
     CommonModule,
+    ReactiveFormsModule,
     OrderRoutingModule,
     SharedModule,
     MaterialModule
